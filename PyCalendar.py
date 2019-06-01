@@ -70,7 +70,7 @@ def makeDeck(date):
     print('\n')
 
 
-def getday(service, date, evtimemin=[0, 0, 0], evtimemax=[23, 59, 59]):
+def getDay(service, date, evtimemin=[0, 0, 0], evtimemax=[23, 59, 59]):
     day, month, year = date.day, date.month, date.year
     tmin = datetime.datetime(year, month, day, evtimemin[0], evtimemin[1], evtimemin[2]).isoformat() + "Z"
     tmax = datetime.datetime(year, month, day, evtimemax[0], evtimemax[1], evtimemax[2]).isoformat() + "Z"
@@ -83,9 +83,8 @@ def getday(service, date, evtimemin=[0, 0, 0], evtimemax=[23, 59, 59]):
 
 def makeCalendar(service, date):
     makeDeck(date)
-    events = getday(service, date)
+    events = getDay(service, date)
     for n, event in enumerate(events):
-        # print (event)
         print('[' + str(n) + '] ' + event['start']['dateTime'][11:19] + ' - ' + event['end']['dateTime'][11:19] + ': ', end = '')
         if 'summary' in event:
             print(event['summary'])
@@ -98,6 +97,9 @@ def makeCalendar(service, date):
 
 def makeDate(stringDate):
     listDate = list(map(int, stringDate.split(".")))
+    if listDate[0] < 60:
+        now = datetime.datetime.now()
+       	listDate = [now.year, now.month, now.day] + listDate
     for i in range(6 - len(listDate)):
         listDate.append(0)
     date = datetime.datetime(listDate[0], listDate[1], listDate[2], listDate[3], listDate[4], listDate[5])
@@ -128,8 +130,11 @@ if __name__ == '__main__':
         elif args.rmdate:
             date = args.rmdate.split(".")
             date = list(map(int, date))
-            date, n = datetime.datetime(date[0], date[1], date[2]), date[3]
-            event = getday(service, date)[n]
+            if len(date) == 1:
+                date, n = datetime.datetime.now(), date[0]
+            else:
+                date, n = datetime.datetime(date[0], date[1], date[2]), date[3]
+            event = getDay(service, date)[n]
             print(event['start']['dateTime'][11:19] + ' - ' + event['end']['dateTime'][11:19] + ': ', end = '')
             print(event['summary']) if 'summary' in event else print ("NoName")
             if 'description' in event:
