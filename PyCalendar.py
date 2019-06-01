@@ -39,7 +39,7 @@ def makeDeck(date):
     day, month, year = date.day, date.month, date.year
     nowDay = datetime.datetime.today().day
     weekday = datetime.date(year, month, 1).weekday()
-    print(f"[now is {dateNowStr()}]    {month}/{year}")
+    print("[now is " + dateNowStr() + "]    " + str(month) + "/" + str(year))
     print(" Mon Tue Wed Thu Fri Sat Sun")
     _, n = calendar.monthrange(year, month)
     deck = []
@@ -52,19 +52,19 @@ def makeDeck(date):
     for i in range(len(deck)):
         if deck[i] == str(nowDay):
             if len(deck[i]) == 1:
-                print(f"[ {deck[i]}]", end='')
+                print("[ " + deck[i] + "]", end='')
             else:
-                print(f"[{deck[i]}]", end='')
+                print("[" + deck[i] + "]", end='')
         elif deck[i] == str(day):
             if len(deck[i]) == 1:
-                print(f"! {deck[i]}!", end='')
+                print("! " + deck[i] + "!", end='')
             else:
-                print(f"!{deck[i]}!", end='')
+                print("!" + deck[i] + "!", end='')
         else:
             if len(deck[i]) == 1:
-                print(f"  {deck[i]} ", end='')
+                print("  " + deck[i] + " ", end='')
             else:
-                print(f" {deck[i]} ", end='')
+                print(" " + deck[i] + " ", end='')
         if (i + 1) % 7 == 0:
             print()
     print('\n')
@@ -85,13 +85,23 @@ def makeCalendar(service, date):
     makeDeck(date)
     events = getday(service, date)
     for n, event in enumerate(events):
-        # start = event['start'].get('dateTime', event['start'].get('date'))
         # print (event)
-        print(f'[{n}] ' + event['start']['dateTime'][11:19] + ' - ' + event['end']['dateTime'][11:19] + ': ' + event[
-            'summary'])
+        print('[' + str(n) + '] ' + event['start']['dateTime'][11:19] + ' - ' + event['end']['dateTime'][11:19] + ': ', end = '')
+        if 'summary' in event:
+            print(event['summary'])
+        else:
+            print ('NoName')
         if 'description' in event:
             print(event['description'])
         print()
+
+
+def makeDate(stringDate):
+    listDate = list(map(int, stringDate.split(".")))
+    for i in range(7 - len(listDate)):
+        listDate.append(0)
+    date = datetime.datetime(listDate[0], listDate[1], listDate[2], listDate[3], listDate[4], listDate[5])
+    return date.isoformat()
 
 def main():
     service = build('calendar', 'v3', credentials=login())
@@ -108,6 +118,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     try:
+    #if True:
         service = build('calendar', 'v3', credentials=login())
         if args.swdate:
             date = args.swdate.split(".")
@@ -119,8 +130,8 @@ if __name__ == '__main__':
             date = list(map(int, date))
             date, n = datetime.datetime(date[0], date[1], date[2]), date[3]
             event = getday(service, date)[n]
-            print(event['start']['dateTime'][11:19] + ' - ' + event['end']['dateTime'][11:19] + ': ' + event[
-                    'summary'])
+            print(event['start']['dateTime'][11:19] + ' - ' + event['end']['dateTime'][11:19] + ': ', end = '')
+            print(event['summary']) if 'summary' in event else print ("NoName")
             if 'description' in event:
                 print(event['description'])
             ans = input("You are exactly going to remove?(input 'y' to remove)\n")
@@ -130,14 +141,10 @@ if __name__ == '__main__':
             name = input("Input name of event\n")
             description = input("Input description of event\n")
             sdate = input("Input start of event\n")
-            sdate = sdate.split(".")
-            sdate = list(map(int, sdate))
-            sdate = datetime.datetime(sdate[0], sdate[1], sdate[2], sdate[3], sdate[4], sdate[5]).isoformat()
+            sdate = makeDate(sdate)
 
             edate = input("Input end of event\n")
-            edate = edate.split(".")
-            edate = list(map(int, edate))
-            edate = datetime.datetime(edate[0], edate[1], edate[2], edate[3], edate[4], edate[5]).isoformat()
+            edate = makeDate(edate)
 
             event = {
                 'summary': name,
@@ -159,4 +166,5 @@ if __name__ == '__main__':
             makeCalendar(service, date)
 
     except Exception as e:
-        print(str(e))
+       print ("ERROR")
+       print (str(e))
