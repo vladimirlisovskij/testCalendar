@@ -98,7 +98,7 @@ def makeCalendar(service, date):
 
 def makeDate(stringDate):
     listDate = list(map(int, stringDate.split(".")))
-    for i in range(7 - len(listDate)):
+    for i in range(6 - len(listDate)):
         listDate.append(0)
     date = datetime.datetime(listDate[0], listDate[1], listDate[2], listDate[3], listDate[4], listDate[5])
     return date.isoformat()
