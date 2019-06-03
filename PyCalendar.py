@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 from __future__ import print_function
 
 import datetime
@@ -13,9 +14,10 @@ from googleapiclient.discovery import build
 
 def login():
     SCOPES = ['https://www.googleapis.com/auth/calendar']
+    root = "/root/testCalendar/"
     creds = None
-    if os.path.exists('token.pickle'):
-        with open('token.pickle', 'rb') as token:
+    if os.path.exists(root + 'token.pickle'):
+        with open(root + 'token.pickle', 'rb') as token:
             creds = pickle.load(token)
     # If there are no (valid) credentials available, let the user log in.
     if not creds or not creds.valid:
@@ -23,7 +25,7 @@ def login():
             creds.refresh(Request())
         else:
             flow = InstalledAppFlow.from_client_secrets_file(
-                'credentials.json', SCOPES)
+                root + 'credentials.json', SCOPES)
             creds = flow.run_local_server()
         # Save the credentials for the next run
         with open('token.pickle', 'wb') as token:
@@ -84,15 +86,18 @@ def getDay(service, date, evtimemin=[0, 0, 0], evtimemax=[23, 59, 59]):
 def makeCalendar(service, date):
     makeDeck(date)
     events = getDay(service, date)
-    for n, event in enumerate(events):
-        print('[' + str(n) + '] ' + event['start']['dateTime'][11:19] + ' - ' + event['end']['dateTime'][11:19] + ': ', end = '')
-        if 'summary' in event:
-            print(event['summary'])
-        else:
-            print ('NoName')
-        if 'description' in event:
-            print(event['description'])
-        print()
+    if len(events) == 0:
+        print ("No events")
+    else:
+        for n, event in enumerate(events):
+            print('[' + str(n) + '] ' + event['start']['dateTime'][11:19] + ' - ' + event['end']['dateTime'][11:19] + ': ', end = '')
+            if 'summary' in event:
+                print(event['summary'])
+            else:
+                print ('NoName')
+            if 'description' in event:
+                print(event['description'])
+            print()
 
 
 def makeDate(stringDate):
