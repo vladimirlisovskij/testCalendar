@@ -40,6 +40,8 @@ def dateNowStr():
 def makeDeck(date):
     day, month, year = date.day, date.month, date.year
     nowDay = datetime.datetime.today().day
+    nowMonth = datetime.datetime.today().month
+    nowYear = datetime.datetime.today().year
     weekday = datetime.date(year, month, 1).weekday()
     print("[now is " + dateNowStr() + "]    " + str(month) + "/" + str(year))
     print(" Mon Tue Wed Thu Fri Sat Sun")
@@ -52,7 +54,7 @@ def makeDeck(date):
         deck.insert(0, '  ')
 
     for i in range(len(deck)):
-        if deck[i] == str(nowDay):
+        if deck[i] == str(nowDay) and month == nowMonth and year == nowYear:
             if len(deck[i]) == 1:
                 print("[ " + deck[i] + "]", end='')
             else:
